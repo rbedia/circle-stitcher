@@ -13,12 +13,21 @@ MM_PER_INCH = 25.4
 
 H_lit = pp.Literal("H")
 IC_lit = pp.Literal("IC")
+
+K_lit = pp.Literal("K")
+N_lit = pp.Literal("N")
+M_lit = pp.Literal("M")
+
 L_lit = pp.Literal("L")
 S_lit = pp.Literal("S")
 C_lit = pp.Literal("C")
 
 integer = pp.Word(pp.nums)
 integer.set_parse_action(lambda tokens: int(tokens[0]))
+
+k_option = K_lit + pp.pyparsing_common.fnumber("k")
+n_option = N_lit + integer("n")
+m_option = M_lit + integer("m")
 
 h_option = H_lit + integer("holes")
 inner_circle_option = IC_lit + integer("inner_circle")
@@ -27,11 +36,15 @@ s_option = S_lit + integer("start_hole")
 c_option = C_lit + integer("chord_count")
 
 statement = l_option + pp.Opt(s_option) + pp.Opt(c_option)
-grammar = (
+preamble = (
     pp.Opt(h_option)
+    + pp.Opt(k_option)
+    + pp.Opt(n_option)
+    + pp.Opt(m_option)
     + pp.Opt(inner_circle_option)
-    + pp.DelimitedList(pp.Group(statement), delim=";")("statements")
 )
+
+grammar = preamble + pp.DelimitedList(pp.Group(statement), delim=";")("statements")
 
 
 @click.command()
@@ -43,15 +56,27 @@ def main(commands: str) -> None:
     # "L 10,1 S 2 C 15"
     # "L 10,1 S 2 C 15 ; L 3 C 20"
     # "H 16 L 10,1 S 2 C 15 ; L 3 C 20"
+    # "H 42 IC 13 L 18,1"
+    # "H 42 K 0.8 N 6 M 3 IC 13 L 18,1"
 
     results = grammar.parse_string(commands)
     holes = 32
+    inner_circle_r = 15.875
+
     if results.holes:
         holes = results.holes
-    inner_circle_r = 15.875
     if results.inner_circle:
         inner_circle_r = results.inner_circle
+
     stitcher = CircleStitcher(holes, inner_circle_r)
+
+    if results.k:
+        stitcher.k = results.k
+    if results.n:
+        stitcher.sides = results.n
+    if results.m:
+        stitcher.m = results.m
+
     stitcher.draw()
 
     for state in results.statements:
@@ -97,6 +122,15 @@ class CircleStitcher:
         self.elements: list[svg.Element] = []
 
         self.holes = holes
+
+        # Controls for the roundness of the needle hole pattern
+        # How much the circle pushes in or out
+        # 0 makes a circle so the number of sides and m don't matter
+        self.k = 0
+        # Number of sides of the shape
+        self.sides = 1
+        # Number of points on each edge
+        self.m = 0
 
         self.hole_usage = [0] * self.holes
 
@@ -295,12 +329,12 @@ class CircleStitcher:
         """
         if r == 0:
             r = self.circle_r
-        k = 0.5
-        n = 7
-        m = 5
         rad = self.hole_angle(index) * (math.pi / 180)
-        p = math.cos((2 * math.asin(k) + math.pi * m) / (2 * n)) / math.cos(
-            (2 * math.asin(k * math.cos(n * rad)) + math.pi * m) / (2 * n)
+        p = math.cos(
+            (2 * math.asin(self.k) + math.pi * self.m) / (2 * self.sides)
+        ) / math.cos(
+            (2 * math.asin(self.k * math.cos(self.sides * rad)) + math.pi * self.m)
+            / (2 * self.sides)
         )
         # inscribed
         # p = math.cos(math.pi / n) /
