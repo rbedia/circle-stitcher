@@ -1,0 +1,13 @@
+{
+  "_template": "https://github.com/rbedia/cookiecutter-hypermodern-python",
+  "author": "Rafael Bedia",
+  "copyright_year": "2025",
+  "development_status": "Development Status :: 3 - Alpha",
+  "email": "rafael.bedia@gmail.com",
+  "friendly_name": "Circle Stitcher",
+  "github_user": "rbedia",
+  "license": "MIT",
+  "package_name": "circle_stitcher",
+  "project_name": "circle-stitcher",
+  "version": "0.0.1"
+}

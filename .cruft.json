@@ -1,0 +1,21 @@
+{
+  "template": "https://github.com/rbedia/cookiecutter-hypermodern-python",
+  "commit": "5bfa0552da7c94d5421d4e0ab66a8fb67b920aa9",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "circle-stitcher",
+      "package_name": "circle_stitcher",
+      "friendly_name": "Circle Stitcher",
+      "author": "Rafael Bedia",
+      "email": "rafael.bedia@gmail.com",
+      "github_user": "rbedia",
+      "version": "0.0.1",
+      "copyright_year": "2025",
+      "license": "MIT",
+      "development_status": "Development Status :: 3 - Alpha",
+      "_template": "https://github.com/rbedia/cookiecutter-hypermodern-python"
+    }
+  },
+  "directory": null
+}
