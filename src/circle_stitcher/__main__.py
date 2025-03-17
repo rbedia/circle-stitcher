@@ -90,7 +90,7 @@ def main(commands: str) -> None:
 class CircleStitcher:
     """Draw stitches around a circle following a prescribed pattern."""
 
-    def __init__(self, holes: int, empty_circle_r: int) -> None:
+    def __init__(self, holes: int, empty_circle_r: float) -> None:
         self.svg_width = 840
         self.svg_height = 1000
 

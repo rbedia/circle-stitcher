@@ -20,7 +20,8 @@ def test_main_succeeds(runner: CliRunner, chtmpdir: Path) -> None:
     """It exits with a status code of zero."""
     out = chtmpdir / "out"
     out.mkdir()
-    result = runner.invoke(__main__.main)
+    args = ["H 42 K 0.5 N 5 M 1 IC 13 L 18,1"]
+    result = runner.invoke(__main__.main, args=args)
     assert result.exit_code == 0
 
 
