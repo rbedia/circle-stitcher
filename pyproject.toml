@@ -23,7 +23,7 @@ pyparsing = "^3.2.1"
 
 [tool.poetry.group.test.dependencies]
 pytest = ">=6.2.5"
-coverage = {extras = ["toml"], version = "^6.1"}
+coverage = {extras = ["toml"], version = ">=6.1"}
 xdoctest = {extras = ["colors"], version = ">=0.15.10"}
 
 [tool.poetry.group.dev.dependencies]
