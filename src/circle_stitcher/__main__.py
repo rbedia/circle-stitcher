@@ -138,38 +138,6 @@ class CircleStitcher:
         """Render the drawing."""
         self.draw_background()
 
-        # self.draw_sequence([2, 2])
-        # self.draw_sequence([10, 1])
-        # self.draw_sequence([12, 11])
-        # self.draw_sequence([15, 11])
-        # self.draw_sequence([1, 13])
-
-        # self.draw_sequence([15, 1])
-        # self.draw_sequence([15, 1], start_hole=1)
-        # self.draw_sequence([16, 1])
-        # self.draw_sequence([16, 1, 14, 4])
-
-        # self.draw_sequence([13, 3])
-        # self.draw_sequence([13, 3], start_hole=2)
-
-        # self.draw_sequence([13, 3, 6, 1, 2])
-        # self.draw_sequence([1, 9, 2, 9])
-        # self.draw_sequence([1, 11, 2, 11])
-        # self.draw_sequence([1, 10, 2, 11])
-
-        # self.draw_sequence([10, 2, 19, 3])
-
-        # self.draw_sequence([10, 2, 19, 3, 15, 1])
-        # self.draw_sequence([10, 2, 19, 3, 13, 3])
-        # self.draw_sequence([10, 2, 19, 3, 16, 1])
-
-        # self.draw_sequence([12, 14])
-        # self.draw_sequence([12, 14], start_hole=1)
-        # self.draw_sequence([19, 17], start_hole=3)
-
-        # self.draw_sequence([3, 12, 5, 13], chord_count=100)
-        # self.draw_sequence([14, 1, 8, 1])
-
     def render(self) -> None:
         """Write SVG to disk."""
         doc = svg.SVG(
@@ -336,33 +304,12 @@ class CircleStitcher:
             (2 * math.asin(self.k * math.cos(self.sides * rad)) + math.pi * self.m)
             / (2 * self.sides)
         )
-        # inscribed
-        # p = math.cos(math.pi / n) /
-        # math.cos(rad - (2 * math.pi / n *
-        # math.floor((n * rad + math.pi) / (2 * math.pi))))
-
-        # circumscribed
-        # p = 1 / math.cos((2 / n) * math.asin(math.sin((n / 2) * rad)))
 
         x = r * math.cos(rad) * p
         y = r * math.sin(rad) * p
         cx = self.center_x + x
         cy = self.center_y + y
         return cx, cy
-
-    # def hole_to_xy(self, index: int, r: float = 0) -> tuple[float, float]:
-    #     """Convert hole number to x, y coordinates.
-
-    #     Hole 0 is to the right and counting is clockwise.
-    #     """
-    #     if r == 0:
-    #         r = self.circle_r
-    #     rad = self.hole_angle(index) * (math.pi / 180)
-    #     x = math.cos(rad) * r
-    #     y = math.sin(rad) * r
-    #     cx = self.center_x + x
-    #     cy = self.center_y + y
-    #     return cx, cy
 
     def hole_angle(self, index: int) -> float:
         """Calculate hole's angle on the circle.
