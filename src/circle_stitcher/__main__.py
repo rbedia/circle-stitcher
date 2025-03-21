@@ -3,6 +3,7 @@
 import itertools
 import math
 from pathlib import Path
+from textwrap import dedent
 from typing import Generator
 
 import click
@@ -136,6 +137,32 @@ class CircleStitcher:
 
     def draw(self) -> None:
         """Render the drawing."""
+        self.elements.append(
+            svg.Style(
+                text=dedent(f"""
+                .hole {{
+                    fill: {self.hole_fill};
+                    stroke: {self.hole_stroke};
+                    r: {self.hole_r};
+                }}
+                .index {{
+                    font-size: {self.hole_font_size}px;
+                    text-anchor: middle;
+                }}
+                .front {{
+                    stroke: {self.chord_front_color};
+                    stroke-width: 3px;
+                }}
+                .back {{
+                    stroke: {self.chord_back_color};
+                    stroke-width: 3px;
+                }}
+                .summary {{
+                    font-size: {self.summary_font_size}px;
+                }}
+            """)
+            )
+        )
         self.draw_background()
 
     def render(self) -> None:
@@ -167,7 +194,7 @@ class CircleStitcher:
             svg.Circle(
                 cx=self.center_x,
                 cy=self.center_y,
-                r=self.empty_circle_r,
+                r=round(self.empty_circle_r, 1),
                 fill=self.empty_circle_fill,
                 stroke=self.empty_circle_stroke,
             )
@@ -180,13 +207,7 @@ class CircleStitcher:
         for i in range(self.holes):
             cx, cy = self.hole_to_xy(i)
             self.elements.append(
-                svg.Circle(
-                    cx=cx,
-                    cy=cy,
-                    r=self.hole_r,
-                    fill=self.hole_fill,
-                    stroke=self.hole_stroke,
-                )
+                svg.Circle(cx=round(cx, 1), cy=round(cy, 1), class_=["hole"])
             )
 
     def draw_sequence(
@@ -252,7 +273,7 @@ class CircleStitcher:
                 text="Sequence: " + ", ".join([str(x) for x in lengths]),
                 x=self.summary_text_x,
                 y=self.summary_text_y,
-                font_size=self.summary_font_size,
+                class_=["summary"],
             )
         )
         scaled_length = total_length / self.scaling / MM_PER_INCH
@@ -261,7 +282,7 @@ class CircleStitcher:
                 text=f'Length: {scaled_length:0.1f}"',
                 x=self.summary_text_x,
                 y=self.summary_text_y + self.summary_font_size,
-                font_size=self.summary_font_size,
+                class_=["summary"],
             )
         )
 
@@ -269,8 +290,14 @@ class CircleStitcher:
         """Draw a circle chord."""
         x1, y1 = self.hole_to_xy(hole1)
         x2, y2 = self.hole_to_xy(hole2)
-        stroke_color = self.chord_front_color if front else self.chord_back_color
-        return svg.Line(x1=x1, y1=y1, x2=x2, y2=y2, stroke=stroke_color, stroke_width=3)
+        cls = "front" if front else "back"
+        return svg.Line(
+            x1=round(x1, 1),
+            y1=round(y1, 1),
+            x2=round(x2, 1),
+            y2=round(y2, 1),
+            class_=[cls],
+        )
 
     def stroke_index(self, hole: int, count: int) -> svg.Text:
         """Draw the text next to a hole for where it is in the sequence."""
@@ -283,11 +310,10 @@ class CircleStitcher:
         self.hole_usage[hole % self.holes] += 1
         return svg.Text(
             text=str(count),
-            x=x,
-            y=y,
-            font_size=self.hole_font_size,
-            text_anchor="middle",
-            transform=[svg.Rotate(angle, x, y)],
+            x=round(x, 1),
+            y=round(y, 1),
+            class_=["index"],
+            transform=[svg.Rotate(round(angle, 1), round(x, 1), round(y, 1))],
         )
 
     def hole_to_xy(self, index: int, r: float = 0) -> tuple[float, float]:
