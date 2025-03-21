@@ -70,6 +70,7 @@ def main(commands: str) -> None:
         inner_circle_r = results.inner_circle
 
     stitcher = CircleStitcher(holes, inner_circle_r)
+    stitcher.commands_text = commands
 
     if results.k:
         stitcher.k = results.k
@@ -114,6 +115,10 @@ class CircleStitcher:
         self.summary_text_x = 10
         self.summary_text_y = 30
         self.summary_font_size = 30
+
+        self.commands_text_x = 10
+        self.commands_text_y = self.svg_height - 10
+        self.commands_text = ""
 
         self.hole_font_size = 18
 
@@ -164,6 +169,14 @@ class CircleStitcher:
             )
         )
         self.draw_background()
+        self.elements.append(
+            svg.Text(
+                text=f"Instructions: {self.commands_text}",
+                x=self.commands_text_x,
+                y=self.commands_text_y,
+                class_=["summary"],
+            )
+        )
 
     def render(self) -> None:
         """Write SVG to disk."""
