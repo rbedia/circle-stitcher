@@ -2,7 +2,6 @@
 
 import itertools
 import math
-from pathlib import Path
 from textwrap import dedent
 from typing import Generator
 
@@ -11,8 +10,10 @@ import pyparsing as pp
 import svg
 
 MM_PER_INCH = 25.4
+PX_PER_INCH = 96  # Defined by SVG
 
 H_lit = pp.Literal("H")
+OC_lit = pp.Literal("OC")
 IC_lit = pp.Literal("IC")
 
 K_lit = pp.Literal("K")
@@ -31,7 +32,8 @@ n_option = N_lit + integer("n")
 m_option = M_lit + integer("m")
 
 h_option = H_lit + integer("holes")
-inner_circle_option = IC_lit + integer("inner_circle")
+outer_circle_option = OC_lit + pp.pyparsing_common.fnumber("outer_circle")
+inner_circle_option = IC_lit + pp.pyparsing_common.fnumber("inner_circle")
 l_option = L_lit + pp.DelimitedList(integer)("lengths")
 s_option = S_lit + integer("start_hole")
 c_option = C_lit + integer("chord_count")
@@ -39,6 +41,7 @@ c_option = C_lit + integer("chord_count")
 statement = l_option + pp.Opt(s_option) + pp.Opt(c_option)
 preamble = (
     pp.Opt(h_option)
+    + pp.Opt(outer_circle_option)
     + pp.Opt(k_option)
     + pp.Opt(n_option)
     + pp.Opt(m_option)
@@ -50,95 +53,120 @@ grammar = preamble + pp.DelimitedList(pp.Group(statement), delim=";")("statement
 
 @click.command()
 @click.version_option()
+@click.option("-o", "--out", required=True, type=click.File("w"))
 @click.argument("commands")
-def main(commands: str) -> None:
+def main(out: click.utils.LazyFile, commands: str) -> None:
     """Circle Stitcher."""
     # "H 16 L 10,1 S 2 C 15"
     # "L 10,1 S 2 C 15"
     # "L 10,1 S 2 C 15 ; L 3 C 20"
     # "H 16 L 10,1 S 2 C 15 ; L 3 C 20"
     # "H 42 IC 13 L 18,1"
-    # "H 42 K 0.8 N 6 M 3 IC 13 L 18,1"
+    # Chord count limit, starting offset, two sequences
+    # "H 16 L 7,1 S 2 ; L 4 C 2"
+    # Three number sequence
+    # "L 16,1,10"
+    # Hexagon
+    # "H 42 K 0.8 N 6 M 3 IC 13 L 16,3"
+    # Pentagon
+    # "H 35 K 0.9 N 5 M 2 IC 13 L 15,1"
 
     results = grammar.parse_string(commands)
-    holes = 32
-    inner_circle_r = 15.875
 
-    if results.holes:
-        holes = results.holes
-    if results.inner_circle:
-        inner_circle_r = results.inner_circle
-
-    stitcher = CircleStitcher(holes, inner_circle_r)
+    stitcher = CircleStitcher()
     stitcher.commands_text = commands
 
+    if results.holes:
+        stitcher.holes = results.holes
+    if results.outer_circle:
+        stitcher.circle_r = results.outer_circle * PX_PER_INCH
     if results.k:
         stitcher.k = results.k
     if results.n:
         stitcher.sides = results.n
     if results.m:
         stitcher.m = results.m
+    if results.inner_circle:
+        stitcher.empty_circle_r = results.inner_circle * PX_PER_INCH
 
     stitcher.draw()
 
     for state in results.statements:
         chord_count = state.chord_count if state.chord_count else 0
         start_hole = state.start_hole if state.start_hole else 0
-        stitcher.draw_sequence(state.lengths, chord_count, start_hole)
+        stitcher.draw_sequence(list(state.lengths), chord_count, start_hole)
 
-    stitcher.render()
+    stitcher.render(out)
 
 
 class CircleStitcher:
     """Draw stitches around a circle following a prescribed pattern."""
 
-    def __init__(self, holes: int, empty_circle_r: float) -> None:
-        self.svg_width = 840
-        self.svg_height = 1000
+    def __init__(self) -> None:
+        self.svg_width = 350
+        self.svg_height = 350
+        self.svg_scaling = 2
 
-        self.scaling = 300 / 20.434
+        self.circle_r = 70
+        self.empty_circle_r = 60
 
-        self.circle_r = 300
-        self.empty_circle_r = empty_circle_r * self.scaling
-
-        self.empty_circle_fill = "#eeeecc"
+        self.empty_circle_fill = "#EBE4D6"
         self.cardboard_color = "#ffffff"
         self.empty_circle_stroke = "#dddddd"
 
-        self.hole_r = 10
-        self.hole_fill = "#fbfbc5"
+        self.hole_r = 2
+        self.hole_fill = "#EBE4D6"
         self.hole_stroke = "#333333"
 
-        self.chord_front_color = "#ff0000"
-        self.chord_back_color = "#33cc33"
+        self.chord_width = "1px"
+        self.chord_front_color = "#2B8FF3"
+        self.chord_back_color = "#F50C00"
 
         self.summary_text_x = 10
-        self.summary_text_y = 30
-        self.summary_font_size = 30
+        self.summary_text_y = 15
+        self.summary_font_size = 15
 
         self.commands_text_x = 10
-        self.commands_text_y = self.svg_height - 10
+        self.commands_text_y = self.svg_height - 5
         self.commands_text = ""
 
-        self.hole_font_size = 18
-
-        self.center_x = self.svg_width / 2
-        self.center_y = self.svg_height / 2
+        self.hole_font_size = 8
 
         self.elements: list[svg.Element] = []
 
-        self.holes = holes
+        self.holes = 32
 
         # Controls for the roundness of the needle hole pattern
         # How much the circle pushes in or out
         # 0 makes a circle so the number of sides and m don't matter
-        self.k = 0
+        self.k: float = 0
         # Number of sides of the shape
-        self.sides = 1
+        self.sides: int = 1
         # Number of points on each edge
-        self.m = 0
+        self.m: float = 0
 
-        self.hole_usage = [0] * self.holes
+        self.outer_ring = 0
+        self.cur_sequence = 0
+
+    @property
+    def holes(self) -> int:
+        """Get number of stitch holes."""
+        return self._holes
+
+    @holes.setter
+    def holes(self, holes: int) -> None:
+        self._holes = holes
+        self.hole_usage = [0] * holes
+
+    @property
+    def center_x(self) -> float:
+        """X origin of the circle."""
+        return self.svg_width / 2
+
+    @property
+    def center_y(self) -> float:
+        """X origin of the circle."""
+        return self.svg_height / 2
 
     def draw(self) -> None:
         """Render the drawing."""
@@ -156,14 +184,23 @@ class CircleStitcher:
                 }}
                 .front {{
                     stroke: {self.chord_front_color};
-                    stroke-width: 3px;
+                    stroke-width: {self.chord_width};
                 }}
                 .back {{
                     stroke: {self.chord_back_color};
-                    stroke-width: 3px;
+                    stroke-width: {self.chord_width};
                 }}
                 .summary {{
                     font-size: {self.summary_font_size}px;
+                }}
+                .seq1 {{
+                    fill: #099A3C
+                }}
+                .seq2 {{
+                    fill: #8B1828
+                }}
+                .seq3 {{
+                    fill: #515F45
                 }}
             """)
             )
@@ -178,20 +215,21 @@ class CircleStitcher:
             )
         )
 
-    def render(self) -> None:
+    def render(self, out: click.utils.LazyFile) -> None:
         """Write SVG to disk."""
         doc = svg.SVG(
-            width=self.svg_width,
-            height=self.svg_height,
+            width=self.svg_width * self.svg_scaling,
+            height=self.svg_height * self.svg_scaling,
+            viewBox=svg.ViewBoxSpec(
+                min_x=0, min_y=0, width=self.svg_width, height=self.svg_width
+            ),
             elements=self.elements,
         )
 
-        filename = "out/circle.svg"
-        Path(filename).write_text(str(doc))
+        out.write(str(doc))
 
     def draw_background(self) -> None:
         """Draw the background elements that stitches will be on top of."""
-        # Fill entire canvas with a solid color to draw on top of
         self.elements.append(
             svg.Rect(
                 x=0,
@@ -228,7 +266,26 @@ class CircleStitcher:
     ) -> None:
         """Draw stitches around the circle following the stitch pattern."""
         gen = self.create_sequence(lengths, chord_count, start_hole)
-        self.draw_sequence_from_gen(gen, lengths)
+        total_length = self.draw_chords(gen)
+        self.draw_summary_text(lengths, total_length)
+
+        self.outer_ring += max(self.hole_usage)
+        self.holes = self.holes  # Reset self.hole_usage
+
+        r_offset = self.hole_font_size * (self.outer_ring + 1)
+        r = self.circle_r + r_offset
+
+        self.elements.append(
+            svg.Circle(
+                cx=self.center_x,
+                cy=self.center_y,
+                r=round(r, 1),
+                fill_opacity=0,
+                stroke=self.empty_circle_stroke,
+            )
+        )
+
+        self.cur_sequence += 1
 
     def create_sequence(
         self, lengths: list[int], chord_count: int = 0, start_hole: int = 0
@@ -254,9 +311,7 @@ class CircleStitcher:
             index = end_index % self.holes
             first = False
 
-    def draw_sequence_from_gen(
-        self, gen: Generator[tuple[int, int], None, None], lengths: list[int]
-    ) -> None:
+    def draw_chords(self, gen: Generator[tuple[int, int], None, None]) -> float:
         """Draw stitches around the circle following the stitch pattern."""
         front = True
         first = True
@@ -281,23 +336,33 @@ class CircleStitcher:
             count += 1
             first = False
 
+        return total_length
+
+    def draw_summary_text(self, lengths: list[int], total_length: float) -> None:
+        """Draw summary about sequence.
+
+        Summary includes the steps in the sequence and total length.
+        """
         self.elements.append(
             svg.Text(
                 text="Sequence: " + ", ".join([str(x) for x in lengths]),
                 x=self.summary_text_x,
                 y=self.summary_text_y,
-                class_=["summary"],
+                class_=["summary", f"seq{self.cur_sequence}"],
             )
         )
-        scaled_length = total_length / self.scaling / MM_PER_INCH
+        self.summary_text_y += self.summary_font_size
+
+        scaled_length = math.ceil(total_length / PX_PER_INCH)
         self.elements.append(
             svg.Text(
-                text=f'Length: {scaled_length:0.1f}"',
+                text=f'Length: {scaled_length}"',
                 x=self.summary_text_x,
-                y=self.summary_text_y + self.summary_font_size,
-                class_=["summary"],
+                y=self.summary_text_y,
+                class_=["summary", f"seq{self.cur_sequence}"],
             )
         )
+        self.summary_text_y += self.summary_font_size
 
     def stroke_chord(self, hole1: int, hole2: int, front: bool) -> svg.Line:
         """Draw a circle chord."""
@@ -315,7 +380,7 @@ class CircleStitcher:
     def stroke_index(self, hole: int, count: int) -> svg.Text:
         """Draw the text next to a hole for where it is in the sequence."""
         uses = self.hole_usage[hole % self.holes]
-        r_offset = self.hole_font_size * (uses + 1)
+        r_offset = self.hole_font_size * (self.outer_ring + uses + 1) + 1
         x, y = self.hole_to_xy(hole, self.circle_r + r_offset)
         # Turn the text so the bottom is toward the center
         angle = self.hole_angle(hole) + 90
@@ -325,7 +390,7 @@ class CircleStitcher:
             text=str(count),
             x=round(x, 1),
             y=round(y, 1),
-            class_=["index"],
+            class_=["index", f"seq{self.cur_sequence}"],
             transform=[svg.Rotate(round(angle, 1), round(x, 1), round(y, 1))],
         )
 
@@ -337,12 +402,14 @@ class CircleStitcher:
         if r == 0:
             r = self.circle_r
         rad = self.hole_angle(index) * (math.pi / 180)
-        p = math.cos(
-            (2 * math.asin(self.k) + math.pi * self.m) / (2 * self.sides)
-        ) / math.cos(
-            (2 * math.asin(self.k * math.cos(self.sides * rad)) + math.pi * self.m)
-            / (2 * self.sides)
+        m_pi = math.pi * self.m
+
+        dbl_sides = 2 * self.sides
+        numerator = math.cos((2 * math.asin(self.k) + m_pi) / dbl_sides)
+        denominator = math.cos(
+            (2 * math.asin(self.k * math.cos(self.sides * rad)) + m_pi) / dbl_sides
         )
+        p = numerator / denominator
 
         x = r * math.cos(rad) * p
         y = r * math.sin(rad) * p
