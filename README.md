@@ -21,11 +21,18 @@
 
 ## Features
 
-- TODO
+Tool for designing circular stitched pattern templates.
+
+- Holes are numbered to indicate which order they are stitched.
+- Thread on the front is a different color than the back.
+- The size of the center hole is customizable which acts a window for seeing stitches.
+- Calculates length of thread needed.
+- Simple language to define patterns.
+- Outputs in SVG for easy printing or import into CNC software.
 
 ## Requirements
 
-- TODO
+- Python 3.10
 
 ## Installation
 
