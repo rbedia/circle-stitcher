@@ -242,3 +242,19 @@ def docs(session: Session) -> None:
         shutil.rmtree(build_dir)
 
     session.run("sphinx-autobuild", *args)
+
+
+@session(python=python_versions[0])
+def examples(session: Session) -> None:
+    """Generate example stitch templates."""
+    examples = [
+        ("simple", "L 10,1"),
+        ("complex", "H 16 L 7,1 S 2 ; L 4 C 2"),
+        ("three_numbers", "L 16,1,10"),
+        ("hexagon", "H 42 OC 1.1 K 0.8 N 6 M 3 IC 0.7 L 16,3"),
+        ("pentagon", "H 35 OC 1.1 K 0.9 N 5 M 2 IC 0.7 L 15,1"),
+    ]
+
+    session.install(".")
+    for ex in examples:
+        session.run("circle-stitcher", "-o", f"docs/examples/{ex[0]}.svg", ex[1])

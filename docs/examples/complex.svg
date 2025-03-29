@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="700" height="700"><style>
+.hole {
+    fill: #EBE4D6;
+    stroke: #333333;
+    r: 2px;
+}
+.index {
+    font-size: 8px;
+    text-anchor: middle;
+}
+.front {
+    stroke: #2B8FF3;
+    stroke-width: 1px;
+}
+.back {
+    stroke: #F50C00;
+    stroke-width: 1px;
+}
+.summary {
+    font-size: 12px;
+}
+.seq1 {
+    fill: #099A3C
+}
+.seq2 {
+    fill: #8B1828
+}
+.seq3 {
+    fill: #515F45
+}
+</style><rect x="0" y="0" width="350" height="350" fill="#ffffff"/><circle stroke="#dddddd" cx="175.0" cy="175.0" r="60" fill="#EBE4D6"/><circle class="hole" cx="245.0" cy="175.0"/><circle class="hole" cx="239.7" cy="201.8"/><circle class="hole" cx="224.5" cy="224.5"/><circle class="hole" cx="201.8" cy="239.7"/><circle class="hole" cx="175.0" cy="245.0"/><circle class="hole" cx="148.2" cy="239.7"/><circle class="hole" cx="125.5" cy="224.5"/><circle class="hole" cx="110.3" cy="201.8"/><circle class="hole" cx="105.0" cy="175.0"/><circle class="hole" cx="110.3" cy="148.2"/><circle class="hole" cx="125.5" cy="125.5"/><circle class="hole" cx="148.2" cy="110.3"/><circle class="hole" cx="175.0" cy="105.0"/><circle class="hole" cx="201.8" cy="110.3"/><circle class="hole" cx="224.5" cy="125.5"/><circle class="hole" cx="239.7" cy="148.2"/><text class="summary" x="10" y="345">Instructions: H 16 L 7,1 S 2 ; L 4 C 2</text><text class="index seq0" transform="rotate(135.0 230.9 230.9)" x="230.9" y="230.9">1</text><line class="front" x1="224.5" y1="224.5" x2="110.3" y2="148.2"/><text class="index seq0" transform="rotate(292.5 102.0 144.8)" x="102.0" y="144.8">2</text><line class="back" x1="110.3" y1="148.2" x2="125.5" y2="125.5"/><text class="index seq0" transform="rotate(315.0 119.1 119.1)" x="119.1" y="119.1">3</text><line class="front" x1="125.5" y1="125.5" x2="239.7" y2="201.8"/><text class="index seq0" transform="rotate(472.5 248.0 205.2)" x="248.0" y="205.2">4</text><line class="back" x1="239.7" y1="201.8" x2="224.5" y2="224.5"/><text class="index seq0" transform="rotate(135.0 236.5 236.5)" x="236.5" y="236.5">5</text><text class="summary seq0" x="10" y="15">Sequence: 7, 1</text><text class="summary seq0" x="10" y="27">Length: 4"</text><path stroke="#dddddd" d="M 269.0 175.0 L 261.8 211.0 L 241.5 241.5 L 211.0 261.8 L 175.0 269.0 L 139.0 261.8 L 108.5 241.5 L 88.2 211.0 L 81.0 175.0 L 88.2 139.0 L 108.5 108.5 L 139.0 88.2 L 175.0 81.0 L 211.0 88.2 L 241.5 108.5 L 261.8 139.0 Z " fill-opacity="0"/><text class="index seq1" transform="rotate(90.0 270.0 175.0)" x="270.0" y="175.0">1</text><line class="front" x1="245.0" y1="175.0" x2="175.0" y2="245.0"/><text class="index seq1" transform="rotate(180.0 175.0 270.0)" x="175.0" y="270.0">2</text><line class="back" x1="175.0" y1="245.0" x2="105.0" y2="175.0"/><text class="index seq1" transform="rotate(270.0 80.0 175.0)" x="80.0" y="175.0">3</text><text class="summary seq1" x="10" y="39">Sequence: 4</text><text class="summary seq1" x="10" y="51">Length: 3"</text><path stroke="#dddddd" d="M 277.0 175.0 L 269.2 214.0 L 247.1 247.1 L 214.0 269.2 L 175.0 277.0 L 136.0 269.2 L 102.9 247.1 L 80.8 214.0 L 73.0 175.0 L 80.8 136.0 L 102.9 102.9 L 136.0 80.8 L 175.0 73.0 L 214.0 80.8 L 247.1 102.9 L 269.2 136.0 Z " fill-opacity="0"/></svg>
