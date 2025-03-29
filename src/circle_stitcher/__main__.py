@@ -227,6 +227,7 @@ class CircleStitcher:
         )
 
         out.write(str(doc))
+        out.write("\n")
 
     def draw_background(self) -> None:
         """Draw the background elements that stitches will be on top of."""
