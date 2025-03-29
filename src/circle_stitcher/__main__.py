@@ -124,7 +124,7 @@ class CircleStitcher:
 
         self.summary_text_x = 10
         self.summary_text_y = 15
-        self.summary_font_size = 15
+        self.summary_font_size = 12
 
         self.commands_text_x = 10
         self.commands_text_y = self.svg_height - 5
@@ -176,7 +176,7 @@ class CircleStitcher:
                 .hole {{
                     fill: {self.hole_fill};
                     stroke: {self.hole_stroke};
-                    r: {self.hole_r};
+                    r: {self.hole_r}px;
                 }}
                 .index {{
                     font-size: {self.hole_font_size}px;
@@ -272,18 +272,7 @@ class CircleStitcher:
         self.outer_ring += max(self.hole_usage)
         self.holes = self.holes  # Reset self.hole_usage
 
-        r_offset = self.hole_font_size * (self.outer_ring + 1)
-        r = self.circle_r + r_offset
-
-        self.elements.append(
-            svg.Circle(
-                cx=self.center_x,
-                cy=self.center_y,
-                r=round(r, 1),
-                fill_opacity=0,
-                stroke=self.empty_circle_stroke,
-            )
-        )
+        self.create_shell()
 
         self.cur_sequence += 1
 
@@ -363,6 +352,23 @@ class CircleStitcher:
             )
         )
         self.summary_text_y += self.summary_font_size
+
+    def create_shell(self) -> None:
+        """Create a shell to separate each sequence's index numbers."""
+        r_offset = self.hole_font_size * (self.outer_ring + 1)
+        r = self.circle_r + r_offset
+
+        path: list[svg.PathData] = []
+        first = True
+        for hole in range(self.holes):
+            x, y = self.hole_to_xy(hole, r)
+            command = svg.MoveTo if first else svg.LineTo
+            path.append(command(round(x, 1), round(y, 1)))
+            first = False
+        path.append(svg.ClosePath())
+        self.elements.append(
+            svg.Path(d=path, fill_opacity=0, stroke=self.empty_circle_stroke)
+        )
 
     def stroke_chord(self, hole1: int, hole2: int, front: bool) -> svg.Line:
         """Draw a circle chord."""

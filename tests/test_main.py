@@ -125,10 +125,10 @@ def test_draw_summary_text(stitcher: CircleStitcher) -> None:
     assert isinstance(length, svg.Text)
     assert length.text == 'Length: 11"'
     assert length.x == 10
-    assert length.y == 30
+    assert length.y == 27
     assert length.class_ == ["summary", "seq0"]
 
-    assert stitcher.summary_text_y == 45
+    assert stitcher.summary_text_y == 39
 
 
 def test_stroke_chord(stitcher: CircleStitcher) -> None:
