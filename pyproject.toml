@@ -37,6 +37,7 @@ pre-commit-hooks = ">=4.1.0"
 ruff = "*"
 safety = ">=1.10.3"
 typeguard = ">=2.13.3"
+pip-audit = ">=2.8.0"
 
 [tool.poetry.group.docs.dependencies]
 furo = ">=2021.11.12"
