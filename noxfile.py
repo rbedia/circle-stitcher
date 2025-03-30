@@ -154,14 +154,6 @@ def safety(session: Session) -> None:
     session.run("safety", "check", "--full-report", f"--file={requirements}")
 
 
-@session(python=python_versions[0])
-def audit(session: Session) -> None:
-    """Scan dependencies for insecure packages."""
-    requirements = session.poetry.export_requirements()
-    session.install("pip-audit")
-    session.run("pip-audit", "-r", requirements)
-
-
 @session(python=python_versions)
 def mypy(session: Session) -> None:
     """Type-check using mypy."""
