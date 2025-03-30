@@ -66,7 +66,19 @@ Tool for designing circular stitched pattern templates.
 
 ![Pentagon](examples/pentagon.svg)
 
-## Syntax
+## Installation
+
+You can install _Circle Stitcher_ via [pip] from [PyPI]:
+
+```console
+$ pip install circle-stitcher
+```
+
+## Usage
+
+Please see the [Command-line Reference] for details.
+
+### Language syntax in ABNF
 
     DIGIT     =  %x30-39 ; 0-9
     float     = 1*DIGIT ["." *DIGIT]
@@ -100,18 +112,6 @@ Sequences
 - L - Comma separated list of how many holes to skip between stitches
 - S - Starting hole starting with 0 on the right and counting clockwise (default: 0)
 - C - Number of stitches (default: continue until pattern repeats)
-
-## Installation
-
-You can install _Circle Stitcher_ via [pip] from [PyPI]:
-
-```console
-$ pip install circle-stitcher
-```
-
-## Usage
-
-Please see the [Command-line Reference] for details.
 
 ## Contributing
 

@@ -53,10 +53,65 @@ grammar = preamble + pp.DelimitedList(pp.Group(statement), delim=";")("statement
 
 @click.command()
 @click.version_option()
-@click.option("-o", "--out", required=True, type=click.File("w"))
+@click.option(
+    "-o", "--out", required=True, type=click.File("w"), help="File path to write SVG to"
+)
 @click.argument("commands")
 def main(out: click.utils.LazyFile, commands: str) -> None:
-    """Circle Stitcher."""
+    """Circle Stitcher is a tool for creating circular stitched pattern templates.
+
+    COMMANDS is written in the Circle Stitcher language.
+
+    It starts with global options followed by one or more stitch patterns.
+
+    Syntax in ABNF
+
+    \b
+    DIGIT     =  %x30-39 ; 0-9
+    float     = 1*DIGIT ["." *DIGIT]
+    int       = 1*DIGIT
+    h-option  = "H" int
+    oc-option = "OC" float
+    k-option  = "K" float
+    n-option  = "N" int
+    m-option  = "M" float
+    ic-option = "IC" float
+    globals   = [h-option] [oc-option] [k-option] [n-option] [m-option] [ic-option]
+
+    \b
+    l-option  = "L" int *("," int)
+    s-option  = "S" int
+    c-option  = "C" int
+    sequence  = l-option [s-option] [c-option]
+    sequences = sequence *(";" sequence)
+    grammar   = globals + sequences
+
+    Globals
+
+    \b
+    - H - Number of stitch holes (default: 32)
+    - OC - Radius of stitch hole circle in inches (default: 0.73)
+    - K - Pointiness of shape (default: 0)
+    - N - Number of sides of the shape (default: 1)
+    - M - Number of points on side of shape (default: 0)
+    - IC - Radius of center punched hole (default: 0.63)
+
+    Sequences
+
+    \b
+    - L - Comma separated list of how many holes to skip between stitches
+    - S - Starting hole starting with 0 on the right and counting clockwise (default: 0)
+    - C - Number of stitches (default: continue until pattern repeats)
+
+    Examples:
+    \b
+    circle-stitcher -o simple.svg "L 10,1"
+    circle-stitcher -o complex.svg "H 16 L 7,1 S 2 ; L 4 C 2"
+    circle-stitcher -o three_numbers.svg "L 16,1,10"
+    circle-stitcher -o hexagon.svg "H 42 OC 1.1 K 0.8 N 6 M 3 IC 0.7 L 16,3"
+    circle-stitcher -o pentagon.svg "H 35 OC 1.1 K 0.9 N 5 M 2 IC 0.7 L 15,1"
+
+    """  # noqa: D301 \b is a necessary marker for formatting
     # "H 16 L 10,1 S 2 C 15"
     # "L 10,1 S 2 C 15"
     # "L 10,1 S 2 C 15 ; L 3 C 20"
