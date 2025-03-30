@@ -32,6 +32,13 @@ def test_main_minimum_input(runner: CliRunner, chtmpdir: Path) -> None:
     assert result.exit_code == 0
 
 
+def test_main_mm(runner: CliRunner, chtmpdir: Path) -> None:
+    """It exits with a status code of zero."""
+    args = ["--mm", "--out", str(chtmpdir / "test.svg"), "L 18,1"]
+    result = runner.invoke(main, args=args)
+    assert result.exit_code == 0
+
+
 def test_draw_background(stitcher: CircleStitcher) -> None:
     """Tests draw_background."""
     stitcher.draw_background()

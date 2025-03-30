@@ -101,11 +101,11 @@ Please see the [Command-line Reference] for details.
 Globals
 
 - H - Number of stitch holes (default: 32)
-- OC - Radius of stitch hole circle in inches (default: 0.73)
+- OC - Radius of stitch hole circle in inches/mm (default: 0.73in)
 - K - Pointiness of shape (default: 0)
 - N - Number of sides of the shape (default: 1)
 - M - Number of points on side of shape (default: 0)
-- IC - Radius of center punched hole (default: 0.63)
+- IC - Radius of center punched hole in inches/mm (default: 0.63in)
 
 Sequences
 

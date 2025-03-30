@@ -11,6 +11,7 @@ import svg
 
 MM_PER_INCH = 25.4
 PX_PER_INCH = 96  # Defined by SVG
+PX_PER_MM = PX_PER_INCH / MM_PER_INCH
 
 H_lit = pp.Literal("H")
 OC_lit = pp.Literal("OC")
@@ -53,11 +54,12 @@ grammar = preamble + pp.DelimitedList(pp.Group(statement), delim=";")("statement
 
 @click.command()
 @click.version_option()
+@click.option("--mm/--inch", default=False, help="Whether to use mm or inch units")
 @click.option(
     "-o", "--out", required=True, type=click.File("w"), help="File path to write SVG to"
 )
 @click.argument("commands")
-def main(out: click.utils.LazyFile, commands: str) -> None:
+def main(mm: bool, out: click.utils.LazyFile, commands: str) -> None:
     """Circle Stitcher is a tool for creating circular stitched pattern templates.
 
     COMMANDS is written in the Circle Stitcher language.
@@ -90,11 +92,11 @@ def main(out: click.utils.LazyFile, commands: str) -> None:
 
     \b
     - H - Number of stitch holes (default: 32)
-    - OC - Radius of stitch hole circle in inches (default: 0.73)
+    - OC - Radius of stitch hole circle in inches/mm (default: 0.73)
     - K - Pointiness of shape (default: 0)
     - N - Number of sides of the shape (default: 1)
     - M - Number of points on side of shape (default: 0)
-    - IC - Radius of center punched hole (default: 0.63)
+    - IC - Radius of center punched hole in inches/mm (default: 0.63)
 
     Sequences
 
@@ -131,10 +133,13 @@ def main(out: click.utils.LazyFile, commands: str) -> None:
     stitcher = CircleStitcher()
     stitcher.commands_text = commands
 
+    units = PX_PER_MM if mm else PX_PER_INCH
+    stitcher.units = units
+
     if results.holes:
         stitcher.holes = results.holes
     if results.outer_circle:
-        stitcher.circle_r = results.outer_circle * PX_PER_INCH
+        stitcher.circle_r = results.outer_circle * units
     if results.k:
         stitcher.k = results.k
     if results.n:
@@ -142,7 +147,7 @@ def main(out: click.utils.LazyFile, commands: str) -> None:
     if results.m:
         stitcher.m = results.m
     if results.inner_circle:
-        stitcher.empty_circle_r = results.inner_circle * PX_PER_INCH
+        stitcher.empty_circle_r = results.inner_circle * units
 
     stitcher.draw()
 
@@ -164,6 +169,8 @@ class CircleStitcher:
 
         self.circle_r = 70
         self.empty_circle_r = 60
+
+        self.units: float = PX_PER_INCH
 
         self.empty_circle_fill = "#EBE4D6"
         self.cardboard_color = "#ffffff"
@@ -398,10 +405,11 @@ class CircleStitcher:
         )
         self.summary_text_y += self.summary_font_size
 
-        scaled_length = math.ceil(total_length / PX_PER_INCH)
+        scaled_length = math.ceil(total_length / self.units)
+        unit = '"' if self.units == PX_PER_INCH else "mm"
         self.elements.append(
             svg.Text(
-                text=f'Length: {scaled_length}"',
+                text=f"Length: {scaled_length}{unit}",
                 x=self.summary_text_x,
                 y=self.summary_text_y,
                 class_=["summary", f"seq{self.cur_sequence}"],
