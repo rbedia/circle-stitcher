@@ -40,31 +40,31 @@ Tool for designing circular stitched pattern templates.
 
 `circle-stitcher -o simple.svg "L 10,1"`
 
-![Simple](examples/simple.svg)
+![Simple][ex-simple]
 
 ### Complex
 
 `circle-stitcher -o complex.svg "H 16 L 7,1 S 2 ; L 4 C 2"`
 
-![Complex](examples/complex.svg)
+![Complex][ex-complex]
 
 ### Three numbers
 
 `circle-stitcher -o three_numbers.svg "L 16,1,10"`
 
-![Three numbers in sequence](examples/three_numbers.svg)
+![Three numbers in sequence][ex-three_numbers]
 
 ### Hexagon
 
 `circle-stitcher -o hexagon.svg "H 42 OC 1.1 K 0.8 N 6 M 3 IC 0.7 L 16,3"`
 
-![Hexagon](examples/hexagon.svg)
+![Hexagon][ex-hexagon]
 
 ### Pentagon
 
 `circle-stitcher -o pentagon.svg "H 35 OC 1.1 K 0.9 N 5 M 2 IC 0.7 L 15,1"`
 
-![Pentagon](examples/pentagon.svg)
+![Pentagon][ex-pentagon]
 
 ## Installation
 
@@ -143,3 +143,8 @@ This project was generated from [@rbedia]'s [Hypermodern Python Cookiecutter] te
 [license]: https://github.com/rbedia/circle-stitcher/blob/main/LICENSE
 [contributor guide]: https://github.com/rbedia/circle-stitcher/blob/main/CONTRIBUTING.md
 [command-line reference]: https://circle-stitcher.readthedocs.io/en/latest/usage.html
+[ex-simple]: docs/examples/simple.svg
+[ex-complex]: docs/examples/complex.svg
+[ex-three_numbers]: docs/examples/three_numbers.svg
+[ex-hexagon]: docs/examples/hexagon.svg
+[ex-pentagon]: docs/examples/pentagon.svg
