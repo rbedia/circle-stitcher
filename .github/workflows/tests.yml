@@ -59,6 +59,7 @@ jobs:
       - name: Install Poetry
         run: |
           pipx install --pip-args=--constraint=${{ github.workspace }}/.github/workflows/constraints.txt poetry
+          pipx inject --pip-args=--constraint=${{ github.workspace }}/.github/workflows/constraints.txt poetry poetry-plugin-export
           poetry --version
 
       - name: Install Nox
@@ -101,6 +102,7 @@ jobs:
         with:
           name: coverage-data-${{ matrix.os }}-${{ matrix.python }}
           path: ".coverage.*"
+          include-hidden-files: true
 
       - name: Upload documentation
         if: matrix.session == 'docs-build'
@@ -129,6 +131,7 @@ jobs:
       - name: Install Poetry
         run: |
           pipx install --pip-args=--constraint=${{ github.workspace }}/.github/workflows/constraints.txt poetry
+          pipx inject --pip-args=--constraint=${{ github.workspace }}/.github/workflows/constraints.txt poetry poetry-plugin-export
           poetry --version
 
       - name: Install Nox
@@ -152,4 +155,4 @@ jobs:
           nox --session=coverage -- xml
 
       - name: Upload coverage report
-        uses: codecov/codecov-action@v4.4.0
+        uses: codecov/codecov-action@v5.3.1
