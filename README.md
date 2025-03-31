@@ -96,7 +96,7 @@ Please see the [Command-line Reference] for details.
     c-option  = "C" int
     sequence  = l-option [s-option] [c-option]
     sequences = sequence *(";" sequence)
-    grammar   = globals + sequences
+    grammar   = globals + [sequences]
 
 Globals
 

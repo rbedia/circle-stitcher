@@ -49,7 +49,9 @@ preamble = (
     + pp.Opt(inner_circle_option)
 )
 
-grammar = preamble + pp.DelimitedList(pp.Group(statement), delim=";")("statements")
+grammar = preamble + pp.Opt(
+    pp.DelimitedList(pp.Group(statement), delim=";")("statements")
+)
 
 
 @click.command()
@@ -86,7 +88,7 @@ def main(mm: bool, out: click.utils.LazyFile, commands: str) -> None:
     c-option  = "C" int
     sequence  = l-option [s-option] [c-option]
     sequences = sequence *(";" sequence)
-    grammar   = globals + sequences
+    grammar   = globals + [sequences]
 
     Globals
 
