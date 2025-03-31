@@ -143,8 +143,8 @@ This project was generated from [@rbedia]'s [Hypermodern Python Cookiecutter] te
 [license]: https://github.com/rbedia/circle-stitcher/blob/main/LICENSE
 [contributor guide]: https://github.com/rbedia/circle-stitcher/blob/main/CONTRIBUTING.md
 [command-line reference]: https://circle-stitcher.readthedocs.io/en/latest/usage.html
-[ex-simple]: docs/examples/simple.svg
-[ex-complex]: docs/examples/complex.svg
-[ex-three_numbers]: docs/examples/three_numbers.svg
-[ex-hexagon]: docs/examples/hexagon.svg
-[ex-pentagon]: docs/examples/pentagon.svg
+[ex-simple]: https://raw.githubusercontent.com/rbedia/circle-stitcher/main/docs/examples/simple.svg
+[ex-complex]: https://raw.githubusercontent.com/rbedia/circle-stitcher/main/docs/examples/complex.svg
+[ex-three_numbers]: https://raw.githubusercontent.com/rbedia/circle-stitcher/main/docs/examples/three_numbers.svg
+[ex-hexagon]: https://raw.githubusercontent.com/rbedia/circle-stitcher/main/docs/examples/hexagon.svg
+[ex-pentagon]: https://raw.githubusercontent.com/rbedia/circle-stitcher/main/docs/examples/pentagon.svg
