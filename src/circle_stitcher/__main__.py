@@ -173,6 +173,8 @@ class CircleStitcher:
         self.outer_ring = 0
         self.cur_sequence = 0
 
+        self.sequence_colors = ["#000000", "#099A3C", "#8B1828", "#515F45"]
+
     @property
     def holes(self) -> int:
         """Get number of stitch holes."""
@@ -195,6 +197,15 @@ class CircleStitcher:
 
     def draw(self) -> None:
         """Render the drawing."""
+        sequence_style = []
+        for index, color in enumerate(self.sequence_colors):
+            sequence_style.append(
+                dedent(f"""
+                .seq{index} {{
+                    fill: {color}
+                }}
+            """)
+            )
         self.elements.append(
             svg.Style(
                 text=dedent(f"""
@@ -218,15 +229,7 @@ class CircleStitcher:
                 .summary {{
                     font-size: {self.summary_font_size}px;
                 }}
-                .seq1 {{
-                    fill: #099A3C
-                }}
-                .seq2 {{
-                    fill: #8B1828
-                }}
-                .seq3 {{
-                    fill: #515F45
-                }}
+                {"".join(sequence_style)}
             """)
             )
         )
@@ -363,7 +366,7 @@ class CircleStitcher:
                 text="Sequence: " + ", ".join([str(x) for x in lengths]),
                 x=self.summary_text_x,
                 y=self.summary_text_y,
-                class_=["summary", f"seq{self.cur_sequence}"],
+                class_=["summary", self.sequence_class],
             )
         )
         self.summary_text_y += self.summary_font_size
@@ -375,7 +378,7 @@ class CircleStitcher:
                 text=f"Length: {scaled_length}{unit}",
                 x=self.summary_text_x,
                 y=self.summary_text_y,
-                class_=["summary", f"seq{self.cur_sequence}"],
+                class_=["summary", self.sequence_class],
             )
         )
         self.summary_text_y += self.summary_font_size
@@ -423,7 +426,7 @@ class CircleStitcher:
             text=str(count),
             x=round(x, 1),
             y=round(y, 1),
-            class_=["index", f"seq{self.cur_sequence}"],
+            class_=["index", self.sequence_class],
             transform=[svg.Rotate(round(angle, 1), round(x, 1), round(y, 1))],
         )
 
@@ -456,6 +459,12 @@ class CircleStitcher:
         0 degrees is to the right and angles go clockwise.
         """
         return index / self.holes * 360
+
+    @property
+    def sequence_class(self) -> str:
+        """Get current sequence CSS class."""
+        index = self.cur_sequence % len(self.sequence_colors)
+        return f"seq{index}"
 
 
 if __name__ == "__main__":
