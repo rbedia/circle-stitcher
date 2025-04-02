@@ -34,6 +34,11 @@ repos:
         language: system
         types: [python]
         stages: [manual]
+      - id: codespell
+        name: codespell
+        entry: codespell
+        language: python
+        types: [text]
       - id: end-of-file-fixer
         name: Fix End of Files
         entry: end-of-file-fixer

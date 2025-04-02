@@ -42,16 +42,16 @@ def test_main_mm(runner: CliRunner, chtmpdir: Path) -> None:
 def test_draw_background(stitcher: CircleStitcher) -> None:
     """Tests draw_background."""
     stitcher.draw_background()
-    eles = stitcher.elements
+    elements = stitcher.elements
 
-    assert eles[0] == svg.Rect(
+    assert elements[0] == svg.Rect(
         x=0, y=0, width=1000, height=1000, fill=stitcher.cardboard_color
     )
 
-    assert isinstance(eles[1], svg.Circle)
-    assert eles[1].cx == stitcher.center_x
-    assert eles[1].cy == stitcher.center_y
-    assert eles[1].r == pytest.approx(stitcher.empty_circle_r, rel=1e-1)
+    assert isinstance(elements[1], svg.Circle)
+    assert elements[1].cx == stitcher.center_x
+    assert elements[1].cy == stitcher.center_y
+    assert elements[1].r == pytest.approx(stitcher.empty_circle_r, rel=1e-1)
 
 
 def test_draw_holes() -> None:
@@ -64,27 +64,27 @@ def test_draw_holes() -> None:
 
     small.draw_holes()
 
-    eles = small.elements
-    assert len(eles) == 4
-    assert isinstance(eles[0], svg.Circle)
-    assert eles[0].class_ == ["hole"]
-    assert eles[0].cx == pytest.approx(600.0)
-    assert eles[0].cy == pytest.approx(500.0)
+    elements = small.elements
+    assert len(elements) == 4
+    assert isinstance(elements[0], svg.Circle)
+    assert elements[0].class_ == ["hole"]
+    assert elements[0].cx == pytest.approx(600.0)
+    assert elements[0].cy == pytest.approx(500.0)
 
-    assert isinstance(eles[1], svg.Circle)
-    assert eles[1].class_ == ["hole"]
-    assert eles[1].cx == pytest.approx(500.0)
-    assert eles[1].cy == pytest.approx(600.0)
+    assert isinstance(elements[1], svg.Circle)
+    assert elements[1].class_ == ["hole"]
+    assert elements[1].cx == pytest.approx(500.0)
+    assert elements[1].cy == pytest.approx(600.0)
 
-    assert isinstance(eles[2], svg.Circle)
-    assert eles[2].class_ == ["hole"]
-    assert eles[2].cx == pytest.approx(400.0)
-    assert eles[2].cy == pytest.approx(500.0)
+    assert isinstance(elements[2], svg.Circle)
+    assert elements[2].class_ == ["hole"]
+    assert elements[2].cx == pytest.approx(400.0)
+    assert elements[2].cy == pytest.approx(500.0)
 
-    assert isinstance(eles[3], svg.Circle)
-    assert eles[3].class_ == ["hole"]
-    assert eles[3].cx == pytest.approx(500.0)
-    assert eles[3].cy == pytest.approx(400.0)
+    assert isinstance(elements[3], svg.Circle)
+    assert elements[3].class_ == ["hole"]
+    assert elements[3].cx == pytest.approx(500.0)
+    assert elements[3].cy == pytest.approx(400.0)
 
 
 def test_create_sequence(stitcher: CircleStitcher) -> None:
@@ -106,15 +106,15 @@ def test_draw_chords(stitcher: CircleStitcher) -> None:
     total_length = stitcher.draw_chords(x for x in chords)
     assert total_length == pytest.approx(282.8427)
 
-    eles = stitcher.elements
-    assert len(eles) == 5
-    assert eles[0].text == "1"
-    assert isinstance(eles[1], svg.Line)
-    assert eles[1].class_ == ["front"]
-    assert eles[2].text == "2"
-    assert isinstance(eles[3], svg.Line)
-    assert eles[3].class_ == ["back"]
-    assert eles[4].text == "3"
+    elements = stitcher.elements
+    assert len(elements) == 5
+    assert elements[0].text == "1"
+    assert isinstance(elements[1], svg.Line)
+    assert elements[1].class_ == ["front"]
+    assert elements[2].text == "2"
+    assert isinstance(elements[3], svg.Line)
+    assert elements[3].class_ == ["back"]
+    assert elements[4].text == "3"
 
 
 def test_draw_summary_text(stitcher: CircleStitcher) -> None:
