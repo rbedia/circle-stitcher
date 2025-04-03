@@ -45,7 +45,7 @@ def test_draw_background(stitcher: CircleStitcher) -> None:
     elements = stitcher.elements
 
     assert elements[0] == svg.Rect(
-        x=0, y=0, width=1000, height=1000, fill=stitcher.cardboard_color
+        x=0, y=0, width=1000, height=1000, fill=stitcher.theme.cardboard_color
     )
 
     assert isinstance(elements[1], svg.Circle)

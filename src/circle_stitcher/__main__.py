@@ -2,6 +2,7 @@
 
 import itertools
 import math
+from dataclasses import dataclass
 from textwrap import dedent
 from typing import Generator
 
@@ -90,6 +91,8 @@ def main(mm: bool, out: click.utils.LazyFile, commands: str) -> None:
     # "H 42 K 0.8 N 6 M 3 IC 13 L 16,3"
     # Pentagon
     # "H 35 K 0.9 N 5 M 2 IC 13 L 15,1"
+    # Cross hatch
+    # "L 8,1, 22,31, 12,1, 18,31, 16,1, 14,31, 20,1, 10,31 C 33"
 
     results = parser.parse(commands)
 
@@ -122,6 +125,32 @@ def main(mm: bool, out: click.utils.LazyFile, commands: str) -> None:
     stitcher.render(out)
 
 
+@dataclass
+class Theme:
+    """Circle Stitcher visual theme."""
+
+    empty_circle_fill: str
+    empty_circle_stroke: str
+    cardboard_color: str
+    hole_fill: str
+    hole_stroke: str
+    chord_front_color: str
+    chord_back_color: str
+    sequence_colors: list[str]
+
+
+DEFAULT_THEME = Theme(
+    empty_circle_fill="#EBE4D6",
+    empty_circle_stroke="#dddddd",
+    cardboard_color="#ffffff",
+    hole_fill="#EBE4D6",
+    hole_stroke="#333333",
+    chord_front_color="#2B8FF3",
+    chord_back_color="#F50C00",
+    sequence_colors=["#000000", "#099A3C", "#8B1828", "#515F45"],
+)
+
+
 class CircleStitcher:
     """Draw stitches around a circle following a prescribed pattern."""
 
@@ -135,17 +164,11 @@ class CircleStitcher:
 
         self.units: float = PX_PER_INCH
 
-        self.empty_circle_fill = "#EBE4D6"
-        self.cardboard_color = "#ffffff"
-        self.empty_circle_stroke = "#dddddd"
+        self.theme = DEFAULT_THEME
 
         self.hole_r = 2
-        self.hole_fill = "#EBE4D6"
-        self.hole_stroke = "#333333"
 
         self.chord_width = "1px"
-        self.chord_front_color = "#2B8FF3"
-        self.chord_back_color = "#F50C00"
 
         self.summary_text_x = 10
         self.summary_text_y = 15
@@ -173,8 +196,6 @@ class CircleStitcher:
         self.outer_ring = 0
         self.cur_sequence = 0
 
-        self.sequence_colors = ["#000000", "#099A3C", "#8B1828", "#515F45"]
-
     @property
     def holes(self) -> int:
         """Get number of stitch holes."""
@@ -198,7 +219,7 @@ class CircleStitcher:
     def draw(self) -> None:
         """Render the drawing."""
         sequence_style = []
-        for index, color in enumerate(self.sequence_colors):
+        for index, color in enumerate(self.theme.sequence_colors):
             sequence_style.append(
                 dedent(f"""
                 .seq{index} {{
@@ -210,8 +231,8 @@ class CircleStitcher:
             svg.Style(
                 text=dedent(f"""
                 .hole {{
-                    fill: {self.hole_fill};
-                    stroke: {self.hole_stroke};
+                    fill: {self.theme.hole_fill};
+                    stroke: {self.theme.hole_stroke};
                     r: {self.hole_r}px;
                 }}
                 .index {{
@@ -219,11 +240,11 @@ class CircleStitcher:
                     text-anchor: middle;
                 }}
                 .front {{
-                    stroke: {self.chord_front_color};
+                    stroke: {self.theme.chord_front_color};
                     stroke-width: {self.chord_width};
                 }}
                 .back {{
-                    stroke: {self.chord_back_color};
+                    stroke: {self.theme.chord_back_color};
                     stroke-width: {self.chord_width};
                 }}
                 .summary {{
@@ -265,7 +286,7 @@ class CircleStitcher:
                 y=0,
                 width=self.svg_width,
                 height=self.svg_height,
-                fill=self.cardboard_color,
+                fill=self.theme.cardboard_color,
             )
         )
 
@@ -275,8 +296,8 @@ class CircleStitcher:
                 cx=self.center_x,
                 cy=self.center_y,
                 r=round(self.empty_circle_r, 1),
-                fill=self.empty_circle_fill,
-                stroke=self.empty_circle_stroke,
+                fill=self.theme.empty_circle_fill,
+                stroke=self.theme.empty_circle_stroke,
             )
         )
 
@@ -397,7 +418,7 @@ class CircleStitcher:
             first = False
         path.append(svg.ClosePath())
         self.elements.append(
-            svg.Path(d=path, fill_opacity=0, stroke=self.empty_circle_stroke)
+            svg.Path(d=path, fill_opacity=0, stroke=self.theme.empty_circle_stroke)
         )
 
     def stroke_chord(self, hole1: int, hole2: int, front: bool) -> svg.Line:
@@ -463,7 +484,7 @@ class CircleStitcher:
     @property
     def sequence_class(self) -> str:
         """Get current sequence CSS class."""
-        index = self.cur_sequence % len(self.sequence_colors)
+        index = self.cur_sequence % len(self.theme.sequence_colors)
         return f"seq{index}"
 
 
