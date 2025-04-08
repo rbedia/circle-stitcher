@@ -88,9 +88,9 @@ def main(mm: bool, out: click.utils.LazyFile, commands: str) -> None:
     # Three number sequence
     # "L 16,1,10"
     # Hexagon
-    # "H 42 K 0.8 N 6 M 3 IC 13 L 16,3"
+    # "H 42 K 0.8 N 6 M 3 IC 0.45 L 16,3"
     # Pentagon
-    # "H 35 K 0.9 N 5 M 2 IC 13 L 15,1"
+    # "H 35 K 0.9 N 5 M 2 IC 0.45 L 15,1"
     # Cross hatch
     # "L 8,1, 22,31, 12,1, 18,31, 16,1, 14,31, 20,1, 10,31 C 33"
 
