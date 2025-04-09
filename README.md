@@ -83,13 +83,14 @@ Please see the [Command-line Reference] for details.
     DIGIT     =  %x30-39 ; 0-9
     float     = 1*DIGIT ["." *DIGIT]
     int       = 1*DIGIT
+    w-option  = "W" float
     h-option  = "H" int
     oc-option = "OC" float
     k-option  = "K" float
     n-option  = "N" int
     m-option  = "M" float
     ic-option = "IC" float
-    globals   = [h-option] [oc-option] [k-option] [n-option] [m-option] [ic-option]
+    globals   = [w-option] [h-option] [oc-option] [k-option] [n-option] [m-option] [ic-option]
 
     l-option  = "L" int *("," int)
     s-option  = "S" int
@@ -100,6 +101,7 @@ Please see the [Command-line Reference] for details.
 
 Globals
 
+- W - Width and height of the image in inches/mm (default: 3.65)
 - H - Number of stitch holes (default: 32)
 - OC - Radius of stitch hole circle in inches/mm (default: 0.73in)
 - K - Pointiness of shape (default: 0)

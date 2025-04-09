@@ -20,7 +20,11 @@ def runner() -> CliRunner:
 
 def test_main_succeeds(runner: CliRunner, chtmpdir: Path) -> None:
     """It exits with a status code of zero."""
-    args = ["--out", str(chtmpdir / "test.svg"), "H 42 OC 2 K 0.5 N 5 M 1 IC 13 L 18,1"]
+    args = [
+        "--out",
+        str(chtmpdir / "test.svg"),
+        "W 4 H 42 OC 2 K 0.5 N 5 M 1 IC 13 L 18,1",
+    ]
     result = runner.invoke(main, args=args)
     assert result.exit_code == 0
 

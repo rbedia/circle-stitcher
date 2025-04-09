@@ -36,13 +36,15 @@ def main(mm: bool, out: click.utils.LazyFile, commands: str) -> None:
     DIGIT     =  %x30-39 ; 0-9
     float     = 1*DIGIT ["." *DIGIT]
     int       = 1*DIGIT
+    w-option  = "W" float
     h-option  = "H" int
     oc-option = "OC" float
     k-option  = "K" float
     n-option  = "N" int
     m-option  = "M" float
     ic-option = "IC" float
-    globals   = [h-option] [oc-option] [k-option] [n-option] [m-option] [ic-option]
+    globals   = [w-option] [h-option] [oc-option] [k-option] [n-option] [m-option]
+                [ic-option]
 
     \b
     l-option  = "L" int *("," int)
@@ -55,6 +57,7 @@ def main(mm: bool, out: click.utils.LazyFile, commands: str) -> None:
     Globals
 
     \b
+    - W - Width and height of the image in inches/mm (default: 3.65)
     - H - Number of stitch holes (default: 32)
     - OC - Radius of stitch hole circle in inches/mm (default: 0.73)
     - K - Pointiness of shape (default: 0)
@@ -102,6 +105,10 @@ def main(mm: bool, out: click.utils.LazyFile, commands: str) -> None:
     units = PX_PER_MM if mm else PX_PER_INCH
     stitcher.units = units
 
+    if results.size:
+        svg_size = results.size * units
+        stitcher.svg_width = svg_size
+        stitcher.svg_height = svg_size
     if results.holes:
         stitcher.holes = results.holes
     if results.outer_circle:
@@ -175,7 +182,8 @@ class CircleStitcher:
         self.summary_font_size = 12
 
         self.commands_text_x = 10
-        self.commands_text_y = self.svg_height - 5
+        self.commands_text_y_inset = 5
+
         self.commands_text = ""
 
         self.hole_font_size = 8
@@ -259,7 +267,7 @@ class CircleStitcher:
             svg.Text(
                 text=f"Instructions: {self.commands_text}",
                 x=self.commands_text_x,
-                y=self.commands_text_y,
+                y=self.svg_height - self.commands_text_y_inset,
                 class_=["summary"],
             )
         )

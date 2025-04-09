@@ -2,6 +2,7 @@
 
 import pyparsing as pp
 
+W_lit = pp.Literal("W")
 H_lit = pp.Literal("H")
 OC_lit = pp.Literal("OC")
 IC_lit = pp.Literal("IC")
@@ -21,6 +22,7 @@ k_option = K_lit + pp.pyparsing_common.fnumber("k")
 n_option = N_lit + integer("n")
 m_option = M_lit + integer("m")
 
+size_option = W_lit + pp.pyparsing_common.fnumber("size")
 h_option = H_lit + integer("holes")
 outer_circle_option = OC_lit + pp.pyparsing_common.fnumber("outer_circle")
 inner_circle_option = IC_lit + pp.pyparsing_common.fnumber("inner_circle")
@@ -30,7 +32,8 @@ c_option = C_lit + integer("chord_count")
 
 statement = l_option + pp.Opt(s_option) + pp.Opt(c_option)
 preamble = (
-    pp.Opt(h_option)
+    pp.Opt(size_option)
+    + pp.Opt(h_option)
     + pp.Opt(outer_circle_option)
     + pp.Opt(k_option)
     + pp.Opt(n_option)
