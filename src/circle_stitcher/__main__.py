@@ -16,6 +16,9 @@ MM_PER_INCH = 25.4
 PX_PER_INCH = 96  # Defined by SVG
 PX_PER_MM = PX_PER_INCH / MM_PER_INCH
 
+URL = "https://github.com/rbedia/circle-stitcher"
+SOFTWARE_NAME = f"circle-stitcher {importlib.metadata.version('circle_stitcher')}"
+
 
 @click.command()
 @click.version_option()
@@ -137,6 +140,7 @@ def main(mm: bool, out: click.utils.LazyFile, commands: str) -> None:
 class Theme:
     """Circle Stitcher visual theme."""
 
+    name_color: str
     empty_circle_fill: str
     empty_circle_stroke: str
     cardboard_color: str
@@ -148,6 +152,7 @@ class Theme:
 
 
 DEFAULT_THEME = Theme(
+    name_color="#777777",
     empty_circle_fill="#EBE4D6",
     empty_circle_stroke="#dddddd",
     cardboard_color="#ffffff",
@@ -236,13 +241,7 @@ class CircleStitcher:
             elements=self.elements,
         )
 
-        version = importlib.metadata.version("circle_stitcher")
-        out.write(
-            "<!--\n"
-            f"Made with circle-stitcher {version}\n"
-            "https://github.com/rbedia/circle-stitcher\n"
-            "-->\n"
-        )
+        out.write(f"<!--\nMade with {SOFTWARE_NAME}\n{URL}\n-->\n")
         out.write(str(doc))
         out.write("\n")
 
@@ -250,6 +249,7 @@ class CircleStitcher:
         """Render the drawing."""
         self._add_stylesheet()
         self.draw_background()
+        self._draw_logo()
         self.elements.append(
             svg.Text(
                 text=f"Instructions: {self.commands_text}",
@@ -258,6 +258,22 @@ class CircleStitcher:
                 class_=["summary"],
             )
         )
+
+    def _draw_logo(self) -> None:
+        """Draw the software logo."""
+        link = svg.A(href=URL)
+        logo_x = self.svg_width - 10
+        logo_y = 5
+        link_text = svg.Text(
+            text=SOFTWARE_NAME,
+            fill=self.theme.name_color,
+            font_size=10,
+            x=logo_x,
+            y=logo_y,
+            transform=[svg.Rotate(90, x=logo_x, y=logo_y)],
+        )
+        link.elements = [link_text]
+        self.elements.append(link)
 
     def _add_stylesheet(self) -> None:
         """Add stylesheet to SVG document."""
