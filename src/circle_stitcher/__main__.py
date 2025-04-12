@@ -1,5 +1,6 @@
 """Command-line interface."""
 
+import importlib.metadata
 import itertools
 import math
 from dataclasses import dataclass
@@ -224,8 +225,42 @@ class CircleStitcher:
         """X origin of the circle."""
         return self.svg_height / 2
 
+    def render(self, out: click.utils.LazyFile) -> None:
+        """Write SVG to disk."""
+        doc = svg.SVG(
+            width=self.svg_width * self.svg_scaling,
+            height=self.svg_height * self.svg_scaling,
+            viewBox=svg.ViewBoxSpec(
+                min_x=0, min_y=0, width=self.svg_width, height=self.svg_width
+            ),
+            elements=self.elements,
+        )
+
+        version = importlib.metadata.version("circle_stitcher")
+        out.write(
+            "<!--\n"
+            f"Made with circle-stitcher {version}\n"
+            "https://github.com/rbedia/circle-stitcher\n"
+            "-->\n"
+        )
+        out.write(str(doc))
+        out.write("\n")
+
     def draw(self) -> None:
         """Render the drawing."""
+        self._add_stylesheet()
+        self.draw_background()
+        self.elements.append(
+            svg.Text(
+                text=f"Instructions: {self.commands_text}",
+                x=self.commands_text_x,
+                y=self.svg_height - self.commands_text_y_inset,
+                class_=["summary"],
+            )
+        )
+
+    def _add_stylesheet(self) -> None:
+        """Add stylesheet to SVG document."""
         sequence_style = []
         for index, color in enumerate(self.theme.sequence_colors):
             sequence_style.append(
@@ -258,33 +293,10 @@ class CircleStitcher:
                 .summary {{
                     font-size: {self.summary_font_size}px;
                 }}
-                {"".join(sequence_style)}
             """)
+                + "".join(sequence_style)
             )
         )
-        self.draw_background()
-        self.elements.append(
-            svg.Text(
-                text=f"Instructions: {self.commands_text}",
-                x=self.commands_text_x,
-                y=self.svg_height - self.commands_text_y_inset,
-                class_=["summary"],
-            )
-        )
-
-    def render(self, out: click.utils.LazyFile) -> None:
-        """Write SVG to disk."""
-        doc = svg.SVG(
-            width=self.svg_width * self.svg_scaling,
-            height=self.svg_height * self.svg_scaling,
-            viewBox=svg.ViewBoxSpec(
-                min_x=0, min_y=0, width=self.svg_width, height=self.svg_width
-            ),
-            elements=self.elements,
-        )
-
-        out.write(str(doc))
-        out.write("\n")
 
     def draw_background(self) -> None:
         """Draw the background elements that stitches will be on top of."""
